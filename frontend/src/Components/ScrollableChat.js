@@ -150,7 +150,7 @@ let chatDate=messages.length!==0?getMsgDate(messages[0]?.time):getMsgDate(null)
               isLastMessage(messages, i, user._id)) && (
               <Tooltip label={m.sender.name} placement="bottom-start" hasArrow>
                 <Avatar
-                  mt="7px"
+                  mt="15px"
                   mr={1}
                   size="sm"
                   cursor="pointer"

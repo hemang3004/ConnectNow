@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler");
 const User = require("../models/userModel");
 const ChannelMessage = require("../models/channelMessageModel");
 const Channel = require("../models/channelModel");
+const getDate = require("../config/getDate");
 
 const allMessages = asyncHandler(async (req, res) => {
   try {
@@ -30,6 +31,7 @@ const sendMessage = asyncHandler(async (req, res) => {
     title: title,
     content: content,
     channel: channelId,
+    time:getDate()
   };
 
   try {

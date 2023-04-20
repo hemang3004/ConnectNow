@@ -6,6 +6,7 @@ const channelMessageModel = mongoose.Schema(
     title: { type: String, trim: true },
     content: { type: String, trim: true },
     channel: { type: mongoose.Schema.Types.ObjectId, ref: "Channel" },
+    time:{type:String}
   },
   { timestamps: true }
 );
