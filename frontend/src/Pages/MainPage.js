@@ -1,12 +1,15 @@
 import { Box } from "@chakra-ui/react";
 import React, { useEffect } from "react";
 import { useHistory } from "react-router-dom";
-import SideBar from "../Components/SideBar";
-import UpdateProfile from "../Components/UpdateProfile";
+
+const SideBar=React.lazy(()=>import("../Components/SideBar"))
+const UpdateProfile=React.lazy(()=>import("../Components/UpdateProfile"))
+const ChannelPage=React.lazy(()=>import("./ChannelPage"))
+const ChatPages=React.lazy(()=>import("./ChatPages"))
+const ResetPage=React.lazy(()=>import("./ResetPage"))
 import { ChatState } from "../Context/ChatProvider";
-import ChannelPage from "./ChannelPage";
-import ChatPages from "./ChatPages";
-import ResetPage from "./ResetPage";
+
+
 
 const MainPage = () => {
   const { user, setUser, selectedItem } = ChatState();

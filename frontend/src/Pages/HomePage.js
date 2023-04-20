@@ -9,8 +9,9 @@ import {
   TabPanel,
   TabPanels,
 } from "@chakra-ui/react";
-import Login from "../Components/Authentication/Login";
-import Signup from "../Components/Authentication/Signup";
+const Login=React.lazy(()=>import("../Components/Authentication/Login"))
+const Signup=React.lazy(()=>import("../Components/Authentication/Signup"))
+
 import { useHistory } from "react-router-dom";
 import { useEffect } from "react";
 
