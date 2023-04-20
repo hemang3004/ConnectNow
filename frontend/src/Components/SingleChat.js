@@ -63,7 +63,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     newMsg,
     setNewMsg,
     activeUsers,
-    socket
+    socket,
+    socketConnected
   } = ChatState();
 
   const { transcript, resetTranscript, listening } = useSpeechRecognition();
@@ -360,7 +361,6 @@ useEffect(()=>{
 const sendStatus = () => {
   const y = getSenderFull(user, selectedChat.users)._id;
   const x = activeUsers?.filter((u) => u._id === y)[0];
-  console.log("y", x?.online);
   return x?.online;
 };
   return (

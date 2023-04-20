@@ -4,10 +4,7 @@ import { getSender } from "../config/ChatLogics";
 import { ChatState } from "../Context/ChatProvider";
 import CryptoJS from "crypto-js";
 import axios from "axios";
-// import io from "socket.io-client";
 
-// const ENDPOINT = "http://localhost:5000";
-// var socket;
 
 const ChatStack = ({ fetchAgain }) => {
   const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
@@ -74,11 +71,9 @@ const ChatStack = ({ fetchAgain }) => {
         chat?.lastSeen.forEach(element => {
           if(element.participant===String(user._id)){
             lastSeen=element.lastTime
-            console.log(lastSeen,index)
           }
           
         });
-        console.log(lastSeen<chat?.latestMessage?.time)
         return (
         <Box
           onClick={() => setSelectedChat(chat)}

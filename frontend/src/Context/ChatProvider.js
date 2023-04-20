@@ -7,7 +7,8 @@ import io from "socket.io-client";
 // creating context
 const ChatContext = createContext();
 const ENDPOINT = "http://localhost:5000";
-var socket;
+var socket = io(ENDPOINT);
+
 // provide the value that need to use direct in diff pages
 const ChatProvider = ({ children }) => {
   const [user, setUser] = useState();
@@ -17,7 +18,6 @@ const ChatProvider = ({ children }) => {
   const [chats, setChats] = useState();
   const [channels, setChannels] = useState();
   const [socketConnected, setSocketConnected] = useState(false);
-
   // for displaying lastest msg on chat box to do
   const [newMsg, setNewMsg] = useState([]);
   const [selectedItem, setSelectedItem] = useState("Chats");
@@ -25,7 +25,9 @@ const ChatProvider = ({ children }) => {
   const [verifiedEmail, setVerifiedEmail] = useState();
   const [activeUsers, setActiveUsers] = useState([]);
   const history = useHistory();
+  useEffect(()=>{
 
+  },[])
   useEffect(() => {
     //   fetching userinfo from local storage that is logged in or signed up
     const userInfo = JSON.parse(localStorage.getItem("userInfo"));
@@ -43,7 +45,6 @@ const ChatProvider = ({ children }) => {
         history.push("/")
       }
     }else{
-    socket = io(ENDPOINT);
     socket.emit("setup", userInfo);
     socket.on("connected", () =>{
       setSocketConnected(true);
@@ -52,6 +53,7 @@ const ChatProvider = ({ children }) => {
     
     
   }, [history]);
+  
   return (
     <ChatContext.Provider
       value={{

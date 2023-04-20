@@ -41,14 +41,13 @@ import {
 import { FaBloggerB } from "react-icons/fa";
 import { TiDelete } from "react-icons/ti";
 import { RiDeleteBin6Fill } from "react-icons/ri";
-import io from "socket.io-client";
 
 import { useHistory } from "react-router-dom";
 import UserListItem from "./UserAvatar/UserListItem";
 import ScrollableChannelMessage from "./ScrollableChannelMessage";
 
-const ENDPOINT = "http://localhost:5000";
-var socket, selectedChannelCompare;
+
+var  selectedChannelCompare;
 const SingleChannel = ({ fetchAgain, setFetchAgain }) => {
   const {
     selectedChannel,

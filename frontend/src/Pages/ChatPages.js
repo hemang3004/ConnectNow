@@ -5,16 +5,12 @@ import SideDrawer from "../Components/miscellaneous/SideDrawer";
 import MyChats from "../Components/MyChats";
 import { ChatState } from "../Context/ChatProvider";
 import { useHistory } from "react-router-dom";
-import io from "socket.io-client";
-var socket;
 const ChatPages = () => {
-  useEffect(() => {
-    socket = io("http://localhost:3000");
-  }, []);
+
   // taking user state from context api
 
   const history = useHistory();
-  const { user, setUser,activeUsers,setActiveUsers } = ChatState();
+  const { user, setUser,activeUsers,setActiveUsers,socket } = ChatState();
   const [fetchAgain, setFetchAgain] = useState(false);
   useEffect(() => {
     //   fetching userinfo from local storage that is logged in or signed up
