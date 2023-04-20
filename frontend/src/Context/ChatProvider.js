@@ -23,7 +23,7 @@ const ChatProvider = ({ children }) => {
   const [selectedItem, setSelectedItem] = useState("Chats");
   const [selectedChannel, setSelectedChannel] = useState();
   const [verifiedEmail, setVerifiedEmail] = useState();
-
+  const [activeUsers, setActiveUsers] = useState([]);
   const history = useHistory();
 
   useEffect(() => {
@@ -74,8 +74,10 @@ const ChatProvider = ({ children }) => {
         channelNotification,
         setChannelNotification,
         verifiedEmail,
-         setVerifiedEmail,
-         socket
+        setVerifiedEmail,
+        socket,
+        activeUsers,
+        setActiveUsers
 
       }}
     >

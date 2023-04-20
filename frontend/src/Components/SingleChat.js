@@ -63,7 +63,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     newMsg,
     setNewMsg,
     activeUsers,
-    setActiveUsers,
     socket
   } = ChatState();
 
@@ -239,11 +238,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     fetchMessages();
 
     selectedChatCompare = selectedChat;
-    if(selectedChat && !selectedChat.isGroupChat){
-      var id=String(user._id)===selectedChat.users[0]._id?selectedChat.users[1]:selectedChat.users[0]
-      socket.emit("getActiveUser",id._id);
-      socket.on("activeUser",(stat)=>setActiveUser(stat))   
-    }
   }, [selectedChat]);
 
   useEffect(() => {
@@ -348,13 +342,7 @@ getImage();
 console.log()
 },[file])
 
-  const startVideoCall = async (event) => {
-    socket.emit("join video", selectedChat._id, user.name);
-    if (!videoCallOn) {
-      socket.emit("show calling", selectedChat._id, user.name);
-    }
-    history.push("/video-call");
-  };
+ 
 
   const handleEmojiPickerHideShow = () => {
     setShowEmojiPicker(!showEmojiPicker);
@@ -369,6 +357,12 @@ console.log()
 useEffect(()=>{
 
 },[inputRef])
+const sendStatus = () => {
+  const y = getSenderFull(user, selectedChat.users)._id;
+  const x = activeUsers?.filter((u) => u._id === y)[0];
+  console.log("y", x?.online);
+  return x?.online;
+};
   return (
     <>
       {selectedChat ? (
@@ -422,8 +416,8 @@ useEffect(()=>{
               (!selectedChat.isGroupChat ? (
                 <>
                   {/* oppo. user name and icon */}
-                  {getSender(user, selectedChat.users)}
-                  {(activeUser && !selectedChat.isGroupChat)&&(<IconButton
+                  {/* {getSender(user, selectedChat.users)} */}
+                  {/* {(activeUser && !selectedChat.isGroupChat)&&(<IconButton
                 icon={<MdAlbum />}
                 fontSize="20px"
                 size={"m"}
@@ -431,8 +425,21 @@ useEffect(()=>{
                 variant={"ghost"}
                 colorScheme={activeUser && !selectedChat.isGroupChat ?"whatsapp":"red"}
                 ml={{ md: "0px!important" }}
-              />)}
-                  
+              />)} */}
+                  <Stack>
+                    {/* oppo. user name and icon */}
+                    <Box fontSize={"25px !important"}>
+                      {getSender(user, selectedChat.users)}
+                    </Box>
+                    <Box
+                      display={"flex"}
+                      justifyContent={"center"}
+                      fontSize={"12px !important"}
+                      mt={"0px !important"}
+                    >
+                      {sendStatus() ? "Online" : "Offline"}
+                    </Box>
+                  </Stack>
                   <ProfileModal
                     user={getSenderFull(user, selectedChat.users)}
                   />
