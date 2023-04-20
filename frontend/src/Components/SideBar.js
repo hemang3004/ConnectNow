@@ -46,9 +46,6 @@ const SideBar = () => {
     setSelectedItem(component);
   };
 
-  useEffect(() => {
-    console.log("user1", user);
-  }, []);
   const history = useHistory();
 
   const logoutHandler = () => {

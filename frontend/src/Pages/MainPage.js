@@ -20,7 +20,6 @@ const MainPage = () => {
     if (!userInfo) {
       history.push("/");
     }
-    console.log("item", user);
   }, [history]);
 
   return (
