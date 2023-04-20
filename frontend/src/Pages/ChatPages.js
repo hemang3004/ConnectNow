@@ -1,10 +1,10 @@
 import { Box } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import ChatBox from "../Components/ChatBox";
-import SideDrawer from "../Components/miscellaneous/SideDrawer";
-import MyChats from "../Components/MyChats";
 import { ChatState } from "../Context/ChatProvider";
+import React from "react";
 import { useHistory } from "react-router-dom";
+const MyChats=React.lazy(()=>import("../Components/MyChats"))
 const ChatPages = () => {
 
   // taking user state from context api
