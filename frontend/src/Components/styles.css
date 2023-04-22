@@ -5,13 +5,6 @@
   scrollbar-width: none;
 }
 
-.emoji {
-  position: relative;
-  background-color: black;
-  font-size: 1.5rem;
-  color: #ffff00c8;
-  cursor: pointer;
-}
 
 .wrapper {
   position: relative;

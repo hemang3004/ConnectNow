@@ -450,14 +450,7 @@ const sendStatus = () => {
                   {selectedChat.chatName.toUpperCase()}
                   
                   <div style={{ display: "flex", flexDirection: "row" }}>
-                    <IconButton
-                      icon={<MdCall />}
-                      colorScheme={videoCallOn ? "green" : "red"}
-                      variant="solid"
-                      w={"8px"}
-                      mr={"10px"}
-                      onClick={startVideoCall}
-                    ></IconButton>
+                    
 
                     <UpdateGroupChatModal
                       fetchMessages={fetchMessages}

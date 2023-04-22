@@ -85,7 +85,6 @@ io.on("connection", (socket) => {
   });
   socket.on("addUsers", (userData) => {
     addUser(userData, socket.id);
-    console.log("userss", users);
   });
   
   // join a chat
@@ -95,8 +94,7 @@ io.on("connection", (socket) => {
 
   socket.on("typing", (room) => socket.in(room).emit("typing"));
 
-  socket.on("join video", (room, name,id) => {
-    
+  socket.on("join video", (room, name , id) => {
     socket.join(room);
     if(!(room in rooms)){
       rooms[room]={count:1,organizer:name,org_id:id}
@@ -105,11 +103,10 @@ io.on("connection", (socket) => {
       rooms[room].count+=1
     }
     
-    console.log("rooms")
-    console.log(rooms)
     console.log(name + "User Joined Video Room: " + room);
   });
   socket.on("getOrganizerName",(room)=>{
+    console.log(rooms[room]?.organizer,rooms[room]?.org_id)
     socket.emit("organizerName",rooms[room]?.organizer,rooms[room]?.org_id);
   })
   socket.on("leave video",(room)=>{

@@ -10,10 +10,11 @@ const ResetPage=React.lazy(()=>import("./Pages/ResetPage"))
 const VideoRoom=React.lazy(()=>import("./Components/videoRoom"))
 const MainPage=React.lazy(()=>import("./Pages/MainPage"))
 const Verify=React.lazy(()=>import("./Components/Authentication/Verify"))
+import ChatLoading from "./Components/ChatLoading";
 function App() {
   return (
     <div className="App">
-      <Suspense fallback={<div>Loading....</div>}>
+      <Suspense fallback={<div><ChatLoading/></div>}>
       <Route path="/" component={HomePage} exact></Route>
       <Route path="/chats" component={ChatPages} exact></Route>
       <Route path="/reset" component={ResetPage} exact></Route>

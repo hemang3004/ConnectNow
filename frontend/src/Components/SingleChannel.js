@@ -350,7 +350,7 @@ const SingleChannel = ({ fetchAgain, setFetchAgain }) => {
   };
 
   const startVideoCall = async () => {
-    socket.emit("join video", selectedChannel._id, user.name);
+    socket.emit("join video", selectedChannel._id, user.name,user._id);
     if (!videoCallOn) {
       socket.emit(
         "show calling",

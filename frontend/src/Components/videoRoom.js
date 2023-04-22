@@ -1,16 +1,15 @@
 import React from "react";
-import * as XLSX from 'xlsx';
-import FileSaver from 'file-saver';
+import * as XLSX from "xlsx";
+import FileSaver from "file-saver";
 import {
   Box,
   Text,
   Button,
   useToast,
-  Heading,
-  Flex,
   HStack,
   Input,
   FormControl,
+  Icon,
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import "./videoRoom.css";
@@ -19,24 +18,31 @@ import { ChatState } from "../Context/ChatProvider";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
 import AgoraRTM from "agora-rtm-sdk";
-const getTime=()=>{
+import { HiOutlineDownload } from "react-icons/hi";
+const getTime = () => {
   const now = new Date();
-const utcDate = now.getUTCFullYear() + '-' + (now.getUTCMonth() + 1) + '-' + now.getUTCDate();
-const utcTime = now.getUTCHours() + ':' + now.getUTCMinutes() + ':' + now.getUTCSeconds();
-const utcDateTime = utcDate + ' ' + utcTime;
-return utcDateTime;
-}
+  const utcDate =
+    now.getUTCFullYear() +
+    "-" +
+    (now.getUTCMonth() + 1) +
+    "-" +
+    now.getUTCDate();
+  const utcTime =
+    now.getUTCHours() + ":" + now.getUTCMinutes() + ":" + now.getUTCSeconds();
+  const utcDateTime = utcDate + " " + utcTime;
+  return utcDateTime;
+};
 let localTracks = [];
 let remoteUsers = {};
 let localScreenTracks;
 let sharingScreen = false;
-let time=new Date();
+let time = new Date();
 let client;
-let attend={};
-let logs=[['ID','Name','StartTime','EndTime']];
+let attend = {};
+let logs = [["Email", "Name", "StartTime", "EndTime"]];
 let rtmClient;
 let channel;
-let allMessages=[]
+let allMessages = [];
 const getUTCDate = () => {
   let date_ob = new Date();
 
@@ -78,7 +84,7 @@ const getUTCDate = () => {
 const VideoRoom = () => {
   const [showChat, setShowChat] = useState(true);
   const [showParticipants, setShowParticipants] = useState(true);
-  
+
   const [isParticipantsClose, setIsParticipantsClose] = useState(false);
   const [isChatsClose, setIsChatsClose] = useState(false);
   const [localPeople, setLocalPeople] = useState(0);
@@ -86,8 +92,10 @@ const VideoRoom = () => {
   const [videoState, setVideoState] = useState(true);
   const [audioState, setAudioState] = useState(true);
 
-  const { selectedChat, user, selectedChannel,socket } = ChatState();
-  const [excelFileName,setExcelFileName]=useState(selectedChannel.channelName+getTime()+".xlsx")
+  const { selectedChat, user, selectedChannel, socket } = ChatState();
+  const [excelFileName, setExcelFileName] = useState(
+    selectedChannel.channelName + getTime() + ".xlsx"
+  );
   const toast = useToast();
   const history = useHistory();
 
@@ -312,7 +320,7 @@ const VideoRoom = () => {
     const userName = document.createElement("p");
     userName.id = `user-name-${uid}`;
     userName.textContent = user.name;
-    
+
     document.getElementById(`user-container-${uid}`).appendChild(userName);
 
     // this will create a video tag and append it to dynamically created div
@@ -347,7 +355,6 @@ const VideoRoom = () => {
 
     joinStream();
   };
-  
 
   useEffect(() => {
     joinRoomInit();
@@ -381,8 +388,14 @@ const VideoRoom = () => {
 
   let addMemberToDom = async (MemberId) => {
     let { name } = await rtmClient.getUserAttributesByKeys(MemberId, ["name"]);
-    attend[MemberId]={CandidateName:name,startTime:getTime(),endTime:""};
-    
+    const { email } = await getUser(MemberId);
+    attend[MemberId] = {
+      CandidateName: name,
+      startTime: getTime(),
+      endTime: "",
+      Email: email,
+    };
+
     let membersWrapper = document.getElementById("member__list");
     let memberItem = `<div class="member__wrapper" id="member__${MemberId}__wrapper" style="display: flex; align-items: center;">
                         <span class="green__icon" ></span>
@@ -406,12 +419,17 @@ const VideoRoom = () => {
   let removeMemberFromDom = async (MemberId) => {
     let memberWrapper = document.getElementById(`member__${MemberId}__wrapper`);
     memberWrapper.remove();
-    attend[MemberId].endTime=getTime();
-    console.log(attend[MemberId])
-    logs.push([MemberId,attend[MemberId].CandidateName,attend[MemberId].startTime,attend[MemberId].endTime])
+    attend[MemberId].endTime = getTime();
+    console.log(attend[MemberId]);
+    logs.push([
+      attend[MemberId].Email,
+      attend[MemberId].CandidateName,
+      attend[MemberId].startTime,
+      attend[MemberId].endTime,
+    ]);
     delete attend[MemberId];
-    console.log(attend)
-    console.log(logs)
+    console.log(attend);
+    console.log(logs);
     let name =
       memberWrapper.getElementsByClassName("member_name")[0].textContent;
     addBotMessageToDom(`${name} has left the room.`);
@@ -427,7 +445,7 @@ const VideoRoom = () => {
   let handleChannelMessage = async (messageData, MemberId) => {
     console.log("A new message was received");
     let data = JSON.parse(messageData.text);
-    
+
     if (data.type === "chat") {
       addMessageToDom(data.displayName, data.message);
     }
@@ -476,7 +494,7 @@ const VideoRoom = () => {
 
   let addMessageToDom = (name, message) => {
     let messagesWrapper = document.getElementById("messages");
-    allMessages.push([getUTCDate(),{"sender":name,"message":message}])
+    allMessages.push([getUTCDate(), { sender: name, message: message }]);
     let newMessage = `<div class="message__wrapper">
                         <div class="message__body">
                             <strong class="message__author" style="font-weight: 600;">${name}</strong>
@@ -496,7 +514,7 @@ const VideoRoom = () => {
 
   let addBotMessageToDom = (botMessage) => {
     let messagesWrapper = document.getElementById("messages");
-    allMessages.push([getUTCDate(),{"sender":Bot,"message":botMessage}])
+    allMessages.push([getUTCDate(), { sender: "Bot", message: botMessage }]);
     let newMessage = `<div class="message__wrapper">
                         <div class="message__body__bot">
                             <strong class="message__author__bot">🤖 ConnectNow Bot</strong>
@@ -688,52 +706,76 @@ const VideoRoom = () => {
       text: JSON.stringify({ type: "user_left", uid: uid }),
     });
     leaveChannel();
-    socket.emit("leave video",selectedChannel._id)
+    socket.emit("leave video", selectedChannel._id);
     history.push("/main");
     window.location.reload();
   };
   const generateExcelFile = (data, filename) => {
     const worksheet = XLSX.utils.aoa_to_sheet(data);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
-    const fileBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-    const blob = new Blob([fileBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+    const fileBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+    const blob = new Blob([fileBuffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
     FileSaver.saveAs(blob, filename);
   };
-  const downloadAttendance= ()=>{
-    socket.emit("getOrganizerName",selectedChannel._id);
-    socket.on("organizerName",(name,id)=>{
-      if(id===user._id){
-        for(const MemberId in attend){
-          logs.push([MemberId,attend[MemberId].CandidateName,attend[MemberId].startTime,attend[MemberId].endTime])
+  const downloadAttendance = () => {
+    socket.emit("getOrganizerName", selectedChannel._id);
+    socket.on("organizerName", (name, id) => {
+      if (id === user._id) {
+        for (const MemberId in attend) {
+          logs.push([
+            attend[MemberId].Email,
+            attend[MemberId].CandidateName,
+            attend[MemberId].startTime,
+            attend[MemberId].endTime,
+          ]);
         }
-        console.log(name)
-        generateExcelFile(logs,name+'-'+excelFileName);
-      }})}
-  const downloadMesages=()=>{
-    socket.emit("getOrganizerName",selectedChannel._id);
-    socket.on("organizerName",(name,id)=>{
-      if(id===user._id){
-       generateMessageData()
-      }})}
-  const generateMessageData=()=>{
-     const jsonString = JSON.stringify(allMessages);
+        console.log(name);
+        generateExcelFile(logs, name + "-" + excelFileName);
+      }
+    });
+  };
+
+  const adminAttandance = async () => {
+    var bool;
+    await socket.emit("getOrganizerName", selectedChannel._id);
+    await socket.on("organizerName", (name, id) => {
+      console.log(id === user._id);
+      if (id === user._id) bool = true;
+      else bool = false;
+    });
+    console.log("bool ", bool);
+    return bool;
+  };
+  const downloadMesages = () => {
+    socket.emit("getOrganizerName", selectedChannel._id);
+    socket.on("organizerName", (name, id) => {
+      if (id === user._id) {
+        generateMessageData();
+      }
+    });
+  };
+  const generateMessageData = () => {
+    const jsonString = JSON.stringify(allMessages);
     // Create a Blob object with the JSON data
-    const blob = new Blob([jsonString], { type: 'application/json' });
+    const blob = new Blob([jsonString], { type: "application/json" });
     // Create a download link for the file
-    const downloadLink = document.createElement('a');
+    const downloadLink = document.createElement("a");
     downloadLink.href = URL.createObjectURL(blob);
-    downloadLink.download = 'data.json';
+    downloadLink.download = "data.json";
     // Append the link to the document body and click it
     document.body.appendChild(downloadLink);
     downloadLink.click();
     // Clean up by removing the link and revoking the URL object
     document.body.removeChild(downloadLink);
     URL.revokeObjectURL(downloadLink.href);
-      }  
-     
-    
-  
+  };
+
   return (
     <div style={{ width: "100%" }}>
       <Box
@@ -763,7 +805,11 @@ const VideoRoom = () => {
           </svg>
         </Button>
 
-        <Text fontSize="2xl" fontFamily="Work sans" onClick={downloadAttendance}>
+        <Text
+          fontSize="2xl"
+          fontFamily="Work sans"
+          onClick={downloadAttendance}
+        >
           {selectedChannel.channelName}
         </Text>
 
@@ -824,35 +870,41 @@ const VideoRoom = () => {
                 pr={"auto"}
                 bg={"#e2e8f0"}
               >
-                <HStack>
+                <HStack display={"flex"} justifyContent="space-between">
                   <Box>{"Participants"}</Box>
-                  <Box
-                    marginLeft="50px !important"
-                    fontSize="13px !important"
-                    display={showParticipants ? "flex" : "none"}
-                    width={"40px"}
-                    id="members__count"
-                    bg={"#bee3f8"}
-                    justifyContent="center"
-                    alignItems="center"
-                    borderRadius={"md"}
-                    fontWeight="bold !important"
-                    h={"30px"}
-                    fontFamily="Work sans"
-                  >
-                    {/* <p
-                      id="members__count"
-                      display="inline-block"
-                      style={{
-                        backgroundColor: "#e2e8f0",
-                        width: "30px",
-                        alignItems: "center",
+                  <HStack>
+                    <Box
+                      ml={5}
+                      display={"block"}
+                      onClick={() => {
+                        if (adminAttandance()) downloadAttendance();
                       }}
+                      // bg={"#bee3f8"}
                     >
-                      0
-                    </p> */}
-                    {0}
-                  </Box>
+                      <Icon
+                        mt={2}
+                        as={HiOutlineDownload}
+                        ml={{ md: 3, sm: 3, base: 3 }}
+                        boxSize={{ md: 6, sm: 5, base: 5 }}
+                        h={{ md: 12, sm: 10, base: 9 }}
+                      />
+                    </Box>
+                    <Box
+                      fontSize="13px !important"
+                      display={showParticipants ? "flex" : "none"}
+                      width={"40px"}
+                      id="members__count"
+                      bg={"#bee3f8"}
+                      justifyContent="center"
+                      alignItems="center"
+                      borderRadius={"md"}
+                      fontWeight="bold !important"
+                      h={"30px"}
+                      fontFamily="Work sans"
+                    >
+                      {0}
+                    </Box>
+                  </HStack>
                 </HStack>
               </Box>
 

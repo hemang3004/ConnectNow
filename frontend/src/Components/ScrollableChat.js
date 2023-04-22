@@ -143,9 +143,9 @@ let chatDate=messages.length!==0?getMsgDate(messages[0]?.time):getMsgDate(null)
         </Text>
       {messages &&
         messages.map((m, i) => (
-          <>
+          <div key={m._id}>
           <Text fontWeight={"hairline"} display={chatDate!=getMsgDate(m?.time)&&changeDate(getMsgDate(m?.time))?"flex":"none" } justifyContent="center">{chatDate}</Text>
-          <div style={{ display: "flex" }} key={m._id}>
+          <div style={{ display: "flex" }} >
             {(isNextOppoSender(messages, m, i, user._id) ||
               isLastMessage(messages, i, user._id)) && (
               <Tooltip label={m.sender.name} placement="bottom-start" hasArrow>
@@ -207,7 +207,7 @@ let chatDate=messages.length!==0?getMsgDate(messages[0]?.time):getMsgDate(null)
            )}
             
           </div>
-          </>
+          </div>
         ))}
     </ScrollableFeed>
   );

@@ -73,7 +73,7 @@ const ScrollableChannelMessage = ({ messages }) => {
                   <Box fontWeight={"semibold"} fontSize={"sm"}>
                     {m.sender.name}
                   </Box>
-                  <Box>
+                  <Box key={m._id}>
                   {actualDate(m?.time)}
                   </Box>
                   </div>
