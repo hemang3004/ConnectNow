@@ -185,11 +185,13 @@ const renameGroup = asyncHandler(async (req, res) => {
 
 const addToGroup = asyncHandler(async (req, res) => {
   const { chatId, userId } = req.body;
-
+var tm=getDate()
+var str=String(userId)
   const added = await Chat.findByIdAndUpdate(
     chatId,
     {
-      $push: { users: userId },
+      $push: { users: userId,lastDeleted:{participant:str,lastTime:tm},lastSeen:{participant:str,lastTime:tm} },
+      
     },
     {
       new: true,

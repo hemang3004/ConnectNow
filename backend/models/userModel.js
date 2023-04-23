@@ -12,7 +12,8 @@ const userSchema = mongoose.Schema(
       // "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
     },
     verified:{type:Boolean},
-    timeZone:{type:String}
+    timeZone:{type:String},
+    notification:{type:Array,default:[]}
   },
   { timestamps: true }
 );

@@ -128,11 +128,19 @@ const verifyEmail = asyncHandler(async (req, res) => {
 // user authentication
 const authUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-
   // find email in database
   const user = await User.findOne({ email });
+  var notis=[];
+  console.log(user.notification.length)
+  user.notification.forEach(element => {
+    if(element!==''){
+    notis.push(JSON.parse(element))}
+  });
+  
+
   // if email found in db then match password and if both are same then return json data
   if (user && (await user.matchPassword(password))) {
+    
     res.json({
       _id: user._id,
       name: user.name,
@@ -140,8 +148,14 @@ const authUser = asyncHandler(async (req, res) => {
       pic: user.pic,
       token: generateToken.generateToken(user._id),
       verified:user.verified,
-      timeZone:user.timeZone
+      timeZone:user.timeZone,
+      notification:notis
     });
+    User.findByIdAndUpdate(  user._id , { $set: { notification: [] } }, function(err, result) {
+      if (err) {
+        console.log(err);
+      }})
+
   } else {
     res.status(401);
     throw new Error("Invalid Email or Password");
@@ -388,6 +402,22 @@ const updatePassword = asyncHandler(async (req, res) => {
   }
 });
 
+const storeNotifiactions=(offUsers)=>{
+  for (const key in offUsers) {
+    User.findByIdAndUpdate(
+      key,
+      { $push: { notification: offUsers[key] } },
+      { new: true }, // Return the updated document
+      function (err, user) {
+        if (err) {
+          console.log(err);
+        }
+        // The user was successfully updated, do something if needed
+      }
+    );
+  }
+}
+
 module.exports = {
   registerUser,
   authUser,
@@ -399,5 +429,6 @@ module.exports = {
   deleteProfilePicture,
   verifyPassword,
   updatePassword,
-  verifyEmail
+  verifyEmail,
+  storeNotifiactions
 };

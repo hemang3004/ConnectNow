@@ -31,6 +31,7 @@ const ChatProvider = ({ children }) => {
   useEffect(() => {
     //   fetching userinfo from local storage that is logged in or signed up
     const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+    
     setUser(userInfo);
     const url = window.location.href.toString();
     //   if user not logged in then redirect to homepage
@@ -45,6 +46,7 @@ const ChatProvider = ({ children }) => {
         history.push("/")
       }
     }else{
+    
     socket.emit("setup", userInfo);
     socket.on("connected", () =>{
       setSocketConnected(true);

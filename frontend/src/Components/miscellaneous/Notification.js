@@ -21,7 +21,7 @@ import {
     Spinner,
   } from "@chakra-ui/react";
   import { BellIcon, ChevronDownIcon } from "@chakra-ui/icons";
-  import React, { useState } from "react";
+  import React, { useEffect, useState } from "react";
   import { ChatState } from "../../Context/ChatProvider";
   import ProfileModal from "./ProfileModal";
   import { useHistory } from "react-router-dom";

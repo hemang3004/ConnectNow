@@ -9,7 +9,7 @@ const channelRoutes = require("./routes/channelRoutes");
 const channelMessageRoutes = require("./routes/channelMessageRoutes");
 const cors=require("cors")
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
-
+const {storeNotifiactions}=require("./controller/userController")
 // express app
 const app = express();
 //use of dotenv
@@ -48,16 +48,15 @@ const io = require("socket.io")(server, {
   },
 });
 let rooms={}
+let candies=new Set()
 let users = [];
 const addUser = (userData, socketId) => {
   const userExists = users.find((user) => user._id === userData._id);
-
-  // console.log("user exist", userExists);
+  candies.add(userData._id)
   if (!userExists) {
     users.push({ ...userData, socketId, online: true });
   } else {
     const index = users.findIndex((user) => user._id === userData._id);
-    // console.log("user exist index", index);
 
     users[index].socketId = socketId;
     users[index].online = true;
@@ -67,17 +66,14 @@ const addUser = (userData, socketId) => {
 };
 
 const removeUser = (socketId) => {
-  console.log("socketId", socketId);
   const index = users.findIndex((u) => u.socketId === socketId);
-
-  console.log("index", index);
   if (index !== -1) {
     users[index].online = false;
+    candies.delete(users[index]._id)
     io.emit("getUsers", users);
   }
 };
 io.on("connection", (socket) => {
-  // console.log("Connected to socket.io");
   // take user data from frontend
   socket.on("setup", (userData) => {
     socket.join(userData._id);
@@ -114,18 +110,15 @@ io.on("connection", (socket) => {
     // console.log(rooms)
   })
   socket.on("isVideoOn",(room)=>{
-    // console.log("Video is On",rooms)
     socket.emit("VideoOn",rooms[room]!=undefined && rooms[room].count > 0)
   })
 
   socket.on("show calling", (room, user, channel) => {
     socket.in(room).emit("show calling");
 
-    // console.log("new msg", channel);
 
     channel.users.forEach((u) => {
       if (user._id == u._id) return;
-      // console.log("channel", channel);
 
       socket.in(u._id).emit("group video", channel);
     });
@@ -133,10 +126,8 @@ io.on("connection", (socket) => {
 
   socket.on("group video", (newChannelMessage) => {
     var channel = newChannelMessage.channel;
-    // console.log(channel);
     channel.users.forEach((u) => {
       if (u._id == newChannelMessage.sender._id) return;
-      // console.log("channel", channel);
 
       socket.in(u._id).emit("group video recieved", newChannelMessage);
     });
@@ -158,7 +149,6 @@ io.on("connection", (socket) => {
   });
   socket.on("disconnect", () => {
     removeUser(socket.id);
-    console.log("removed", users);
   });
   socket.on("stop typing", (room) => socket.in(room).emit("stop typing"));
 
@@ -166,12 +156,15 @@ io.on("connection", (socket) => {
     var chat = newMessageRecieved.chat;
 
     if (!chat.users) return console.log("chat.users not defined");
-
+    let offlineUsers={}
+   var msg=JSON.stringify(newMessageRecieved)
     chat.users.forEach((user) => {
       if (user._id == newMessageRecieved.sender._id) return;
-
+      if(!candies.has(user._id))offlineUsers[user._id]=msg;
       socket.in(user._id).emit("message recieved", newMessageRecieved);
     });
+    if(Object.keys(offlineUsers).length>0){
+   storeNotifiactions(offlineUsers)}
   });
 
   socket.off("setup", () => {
