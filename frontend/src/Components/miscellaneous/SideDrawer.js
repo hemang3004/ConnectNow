@@ -43,6 +43,7 @@ function SideDrawer() {
     setNotification,
     chats,
     setChats,
+    setSelectedItem
   } = ChatState();
   const history = useHistory();
   const toast = useToast();
@@ -95,9 +96,10 @@ function SideDrawer() {
 
   const accessChat = async (userId) => {
     console.log(userId);
+    setSelectedItem("Chats")
 
     try {
-      setLoadingChat(true);
+      setLoadingChat(true);S
       const config = {
         headers: {
           "Content-type": "application/json",
