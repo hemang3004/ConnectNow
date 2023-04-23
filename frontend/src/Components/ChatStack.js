@@ -67,7 +67,6 @@ const ChatStack = ({ fetchAgain }) => {
    var arr=refs.current[index].querySelectorAll('p');
    arr[2].style.fontWeight="normal"
    arr[3].style.fontWeight="normal"
-
   }
   return (
     <Stack overflowY="scroll">
