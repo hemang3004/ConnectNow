@@ -64,6 +64,7 @@ const MyChats = ({ fetchAgain }) => {
       w={{ base: "100%", md: "31%" }}
       // borderRadius="lg"
       borderWidth="1px"
+      height={"100%"}
     >
       <Box display="flex" justifyContent={"space-evenly"}>
       <Box
