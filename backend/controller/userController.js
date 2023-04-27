@@ -130,6 +130,10 @@ const authUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   // find email in database
   const user = await User.findOne({ email });
+  if(!user.verified){
+    res.status(401);
+    throw new Error("Please Verify");
+  }
   var notis=[];
   console.log(user.notification.length)
   user.notification.forEach(element => {
@@ -166,10 +170,14 @@ const allUsers = asyncHandler(async (req, res) => {
   // query to find user that user search . query based on either email or name
   const keyword = req.query.search
     ? {
-        $or: [
-          { name: { $regex: req.query.search, $options: "i" } },
-          { email: { $regex: req.query.search, $options: "i" } },
-        ],
+        
+        $and:[
+          {verified:true},
+          {$or: [
+            { name: { $regex: req.query.search, $options: "i" } },
+            { email: { $regex: req.query.search, $options: "i" } },
+          ]}
+        ]
       }
     : {};
 
@@ -230,7 +238,7 @@ const resetUserPassWord = asyncHandler(async (req, res) => {
   const id = req.params.id;
   const token = req.params.token;
   const { password } = req.body;
-
+  
   // console.log("id ", id);
 
   const oldUser = await User.findOne({ _id: id });
@@ -263,6 +271,8 @@ const resetUserPassWord = asyncHandler(async (req, res) => {
           }
         );
       } catch (error) {
+    console.log("Wrong")
+
         res.status(401);
         throw new Error("Password not updated!!");
       }
@@ -271,6 +281,7 @@ const resetUserPassWord = asyncHandler(async (req, res) => {
     }
   } catch (error) {
     // console.log(error);
+   
     res.status(401);
     throw new Error("token is not verfied!!");
   }
