@@ -37,14 +37,14 @@ const sendMessage = asyncHandler(async (req, res) => {
     console.log("Invalid data passed into request");
     return res.sendStatus(400);
   }
-
+var tm=getDate()
   var newMessage = {
     sender: req.user._id,
     content: content,
     chat: chatId,
     type:type,
     url:url,
-    time: getDate(),
+    time: tm,
   };
 
 
@@ -58,7 +58,7 @@ const sendMessage = asyncHandler(async (req, res) => {
       select: "name pic email",
     });
    
-    await Chat.findByIdAndUpdate(req.body.chatId, { latestMessage: message });
+    await Chat.findByIdAndUpdate(req.body.chatId, { latestMessage: message,upTime: tm});
 
     res.json(message);
   } catch (error) {

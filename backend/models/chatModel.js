@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const getDate = require("../config/getDate");
 
 const chatModel = mongoose.Schema(
   {
@@ -34,6 +35,9 @@ const chatModel = mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+    upTime:{type:String,
+      default:getDate()
+    }
   },
   { timestamps: true }
 );
