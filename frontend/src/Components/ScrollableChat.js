@@ -19,7 +19,7 @@ import { ChatState } from "../Context/ChatProvider";
 import moment from "moment-timezone";
 
 const icons={"pdf": 'https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/27_Pdf_File_Type_Adobe_logo_logos-512.png',
- "png":"https://thenounproject.com/api/private/icons/212328/edit/?backgroundShape=SQUARE&backgroundShapeColor=%23000000&backgroundShapeOpacity=0&exportSize=752&flipX=false&flipY=false&foregroundColor=%23000000&foregroundOpacity=1&imageFormat=png&rotation=0&token=gAAAAABkL-ishbtD-BAl2Ufeu258ij8Ma1EOZJB0HXEbs8KGgWBe3ESYUErhoB7Q_g_splqDn9MQIVDGaZKbS4qZrN2aj1p4GQ%3D%3D"
+ "png":"http://res.cloudinary.com/dm37epkmg/image/upload/v1682328226/fbrtebnvqsbdiwlkdccj.png"
  }
  const getUTCTime=()=>{
   const now = new Date();
@@ -187,7 +187,7 @@ let chatDate=messages.length!==0?getMsgDate(messages[0]?.time):getMsgDate(null)
                 borderRadius: "10px",
                 padding: "1px 10px",
                 width:"270px",
-                height:"89px",
+                height:"auto",
                 maxWidth: "75%",
                display:"flex",
                 flexDirection:"column"
@@ -195,7 +195,7 @@ let chatDate=messages.length!==0?getMsgDate(messages[0]?.time):getMsgDate(null)
               onClick={(e)=>downloadMedia(e,m?.url)}
             ><span display={"block"} style={{fontSize:"10px",paddingBottom:"7px",paddingTop:"5px",paddingLeft:"5px" }} >{actualDate(m?.time)}</span>
               <div  style={{display:"flex",justifyContent:"space-between"}}>
-              <img src={icons[m.url.split(".").pop()]} style={{ height:50, width: 80,marginLeft:"0",display:"block", objectFit:"cover"}}  />
+              <img src={icons[m.url.split(".").pop()]} style={{ height:50, width: 50,marginLeft:"0",display:"block", objectFit:"cover"}}  />
             <span
               style={{ display:"block",fontSize: 15 , margin:"auto"}}
             >

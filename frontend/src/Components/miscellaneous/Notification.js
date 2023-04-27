@@ -46,7 +46,7 @@ const Notification = () => {
           <Menu>
             <MenuButton p="1">
               <NotificationBadge
-                count={notification.length}
+                count={notification?.length}
                 effect={Effect.SCALE}
               />
               <BellIcon fontSize="2xl" m="1" />

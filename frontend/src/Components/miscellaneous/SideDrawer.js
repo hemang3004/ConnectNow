@@ -1,14 +1,7 @@
 import {
   Box,
   Button,
-  Menu,
-  MenuButton,
-  Text,
   Tooltip,
-  MenuList,
-  Avatar,
-  MenuItem,
-  MenuDivider,
   Drawer,
   useDisclosure,
   DrawerOverlay,
@@ -18,18 +11,15 @@ import {
   Input,
   useToast,
   Spinner,
+  Icon,
 } from "@chakra-ui/react";
-import { BellIcon, ChevronDownIcon } from "@chakra-ui/icons";
+import { TbSearch } from "react-icons/tb";
+
 import React, { useState } from "react";
 import { ChatState } from "../../Context/ChatProvider";
-import ProfileModal from "./ProfileModal";
-import { useHistory } from "react-router-dom";
 import ChatLoading from "../ChatLoading";
 import axios from "axios";
 import UserListItem from "../UserAvatar/UserListItem";
-import { getSender } from "../../config/ChatLogics";
-import { Effect } from "react-notification-badge";
-import NotificationBadge from "react-notification-badge/lib/components/NotificationBadge";
 function SideDrawer() {
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
@@ -39,23 +29,14 @@ function SideDrawer() {
   const {
     setSelectedChat,
     user,
-    notification,
-    setNotification,
     chats,
     setChats,
-    setSelectedItem
+    selectedItem,
+    setSelectedItem,
   } = ChatState();
-  const history = useHistory();
   const toast = useToast();
 
   const { isOpen, onOpen, onClose } = useDisclosure();
-
-  const logoutHandler = () => {
-    localStorage.removeItem("userInfo");
-    localStorage.clear();
-    history.push("/");
-    window.location.reload();
-  };
 
   const handleSearch = async () => {
     if (!search) {
@@ -96,10 +77,10 @@ function SideDrawer() {
 
   const accessChat = async (userId) => {
     console.log(userId);
-    setSelectedItem("Chats")
 
+    setSelectedItem("Chats");
     try {
-      setLoadingChat(true);S
+      setLoadingChat(true);
       const config = {
         headers: {
           "Content-type": "application/json",
@@ -133,19 +114,23 @@ function SideDrawer() {
         justifyContent="space-between"
         alignItems="center"
         w={"85%"}
-            borderRadius="lg"
-            borderWidth="1px"
-      
+        borderRadius="lg"
+        borderWidth="1px"
       >
         <Tooltip label="Search Users to chat" hasArrow placement="bottom-end">
-          <Button variant="ghost" onClick={onOpen}>
-            <i className="fa-solid fa-magnifying-glass"></i>
+          <Button variant="ghost" onClick={onOpen} h={12}>
+            <Icon
+              as={TbSearch}
+              // ml={{ md: 1, sm: 3, base: 3 }}
+              boxSize={{ md: 6, sm: 5, base: 5 }}
+              h={{ md: 12, sm: 10, base: 9 }}
+            ></Icon>
           </Button>
         </Tooltip>
 
         {/* <Text fontSize="2xl" fontFamily="Work sans">
           ConnectNow
-        </Text> */}        
+        </Text> */}
       </Box>
 
       <Drawer placement="left" onClose={onClose} isOpen={isOpen}>
