@@ -2,6 +2,7 @@
 import { Route } from "react-router-dom";
 import "./App.css";
 import React,{Suspense} from "react";
+import { Spinner } from "@chakra-ui/react";
 import ResetPassword from "./Pages/ResetPassword";
 // import ChatPages from "./Pages/ChatPages";
 const ChatPages=React.lazy(()=>import("./Pages/ChatPages"))
@@ -14,7 +15,14 @@ import ChatLoading from "./Components/ChatLoading";
 function App() {
   return (
     <div className="App">
-      <Suspense fallback={<div><ChatLoading/></div>}>
+
+      <Suspense fallback={<div className="loading"><Spinner
+  thickness='4px'
+  speed='0.65s'
+  emptyColor='gray.200'
+  color='blue.500'
+  size='xl'
+/></div>}>
       <Route path="/" component={HomePage} exact></Route>
       <Route path="/chats" component={ChatPages} exact></Route>
       <Route path="/reset" component={ResetPage} exact></Route>
@@ -29,6 +37,7 @@ function App() {
       <Route path="/video-call" component={VideoRoom}></Route>
       </Suspense>
     </div>
+    
   );
 }
 

@@ -57,7 +57,7 @@ const SideBar = () => {
 
   return (
     <ChakraProvider theme={theme}>
-      <Box width="70px" m={0} bg={"#ffffff"} borderWidth="1px" minW={"65px"}>
+      <Box width="70px" m={0} bg={"#fff"} borderWidth="1px" minW={"65px"}>
         <Stack spacing={8} mt={5} ml={2}>
           <Icon as={RxHamburgerMenu} ml={3} boxSize={6} h={12} />
           {user && <SideDrawer />}
