@@ -4,21 +4,19 @@ const User = require("../models/userModel");
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const UserOTP=require("../models/userOtpModel")
+const UserOTP = require("../models/userOtpModel");
 // asyncHandler is used for handle any error that occurs in this controller
 const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password, pic,re } = req.body;
-  let resend=re-'0';
-  
- 
+  const { name, email, password, pic, re } = req.body;
+  let resend = re - "0";
+
   if (!resend && (!name || !email || !password)) {
     res.status(400);
     throw new Error("Please enter all the fields");
   }
 
   let userExist = await User.findOne({ email });
-  
- 
+
   if (userExist && !resend) {
     res.status(400);
     throw new Error("User already exists");
@@ -26,79 +24,79 @@ const registerUser = asyncHandler(async (req, res) => {
 
   // Generate a random verification code
   const verificationCode = Math.floor(100000 + Math.random() * 900000);
- 
+
   // Create a new user object and set the verified field to false
-  if(!resend || !userExist){
+  if (!resend || !userExist) {
     const user = await User.create({
       name,
       email,
       password,
       pic,
       verified: false,
-      timeZone:Intl.DateTimeFormat().resolvedOptions().timeZone
-      
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
-   userExist=user
+    userExist = user;
   }
-  
 
+  // Send an email to the user with the verification code
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: "rahulpatelrahul1425@gmail.com",
+      pass: "pjbpfpecjtglnimj",
+    },
+  });
 
-    // Send an email to the user with the verification code
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: "rahulpatelrahul1425@gmail.com",
-        pass: "pjbpfpecjtglnimj",
-      },
-    });
-    
-    const mailOptions = {
-      from: "youremail@gmail.com",
-      to: userExist.email,
-      subject: "Email Verification Code from ConnectNow",
-      text: `Your verification code is: ${verificationCode}`,
-    };
+  const mailOptions = {
+    from: "youremail@gmail.com",
+    to: userExist.email,
+    subject: "Email Verification Code from ConnectNow",
+    text: `Your verification code is: ${verificationCode}`,
+  };
 
-    transporter.sendMail(mailOptions, function (error, info) {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log("Email sent: " + info.response);
-        console.log(verificationCode)
-      }
-    });
-    if(!resend){
-      await UserOTP.create({
-        userId:userExist._id,
-        otp:verificationCode,
-        createdAt:Date.now(),
-        expiredAt:Date.now()+3600000
-      })
-    }else{
-    var id=userExist._id;
- await UserOTP.findOneAndUpdate({'userId':id},{otp:verificationCode}).catch(err=>console.log(err))
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("Email sent: " + info.response);
+      console.log(verificationCode);
     }
-   
-    res.status(201).json({
-      _id: userExist._id,
-      name:userExist.name,
-      email: userExist.email,
-      pic: userExist.pic,
-      token: generateToken(userExist._id),
-      message: "A verification code has been sent to your email"+`${verificationCode}`,
+  });
+  if (!resend) {
+    await UserOTP.create({
+      userId: userExist._id,
+      otp: verificationCode,
+      createdAt: Date.now(),
+      expiredAt: Date.now() + 3600000,
     });
-  } 
-);
+  } else {
+    var id = userExist._id;
+    await UserOTP.findOneAndUpdate(
+      { userId: id },
+      { otp: verificationCode }
+    ).catch((err) => console.log(err));
+  }
+
+  res.status(201).json({
+    _id: userExist._id,
+    name: userExist.name,
+    email: userExist.email,
+    pic: userExist.pic,
+    token: generateToken(userExist._id),
+    message:
+      "A verification code has been sent to your email" + `${verificationCode}`,
+  });
+});
 const verifyEmail = asyncHandler(async (req, res) => {
   const { verifiedEmail, code } = req.body;
-  let email=verifiedEmail
-// console.log(code)
-  const user = await User.findOne( {email:verifiedEmail} );
-  console.log(user)
-  var id=user._id;
-  
-  const otp=await UserOTP.findOne({userId:id})
-  console.log(otp.otp)
+  let email = verifiedEmail;
+  // console.log(code)
+  const user = await User.findOne({ email: verifiedEmail });
+  console.log(user);
+  var id = user._id;
+
+  const otp = await UserOTP.findOne({ userId: id });
+  console.log(otp.otp);
   if (!user) {
     res.status(400);
     throw new Error("User not found");
@@ -110,56 +108,54 @@ const verifyEmail = asyncHandler(async (req, res) => {
   }
 
   if (String(otp.otp) == String(code)) {
-  // clear the verification code
-  console.log("VErified")
-  await User.findOneAndUpdate(id,{verified:true}).catch(err=>console.log(err))
-    res.status(200).json({status:"verified"})
-  
-  }else{
-    
-    console.log(otp.otp,code)
+    // clear the verification code
+    console.log("VErified");
+    await User.findOneAndUpdate(id, { verified: true }).catch((err) =>
+      console.log(err)
+    );
+    res.status(200).json({ status: "verified" });
+  } else {
+    console.log(otp.otp, code);
     res.status(400);
     throw new Error("Invalid verification code");
   }
 
   // Update the user object to set verified to true
-  
 });
 // user authentication
 const authUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   // find email in database
   const user = await User.findOne({ email });
-  if(!user.verified){
-    res.status(401);
-    throw new Error("Please Verify");
-  }
-  var notis=[];
-  console.log(user.notification.length)
-  user.notification.forEach(element => {
-    if(element!==''){
-    notis.push(JSON.parse(element))}
+  var notis = [];
+  console.log(user.notification.length);
+  user.notification.forEach((element) => {
+    if (element !== "") {
+      notis.push(JSON.parse(element));
+    }
   });
-  
 
   // if email found in db then match password and if both are same then return json data
   if (user && (await user.matchPassword(password))) {
-    
     res.json({
       _id: user._id,
       name: user.name,
       email: user.email,
       pic: user.pic,
       token: generateToken.generateToken(user._id),
-      verified:user.verified,
-      timeZone:user.timeZone,
-      notification:notis
+      verified: user.verified,
+      timeZone: user.timeZone,
+      notification: notis,
     });
-    User.findByIdAndUpdate(  user._id , { $set: { notification: [] } }, function(err, result) {
-      if (err) {
-        console.log(err);
-      }})
-
+    User.findByIdAndUpdate(
+      user._id,
+      { $set: { notification: [] } },
+      function (err, result) {
+        if (err) {
+          console.log(err);
+        }
+      }
+    );
   } else {
     res.status(401);
     throw new Error("Invalid Email or Password");
@@ -170,14 +166,13 @@ const allUsers = asyncHandler(async (req, res) => {
   // query to find user that user search . query based on either email or name
   const keyword = req.query.search
     ? {
-        
-        $and:[
-          {verified:true},
-          {$or: [
-            { name: { $regex: req.query.search, $options: "i" } },
-            { email: { $regex: req.query.search, $options: "i" } },
-          ]}
-        ]
+      $and:[
+        {verified:true},
+        {$or: [
+          { name: { $regex: req.query.search, $options: "i" } },
+          { email: { $regex: req.query.search, $options: "i" } },
+        ]}
+      ]
       }
     : {};
 
@@ -238,7 +233,7 @@ const resetUserPassWord = asyncHandler(async (req, res) => {
   const id = req.params.id;
   const token = req.params.token;
   const { password } = req.body;
-  
+
   // console.log("id ", id);
 
   const oldUser = await User.findOne({ _id: id });
@@ -271,8 +266,6 @@ const resetUserPassWord = asyncHandler(async (req, res) => {
           }
         );
       } catch (error) {
-    console.log("Wrong")
-
         res.status(401);
         throw new Error("Password not updated!!");
       }
@@ -281,7 +274,6 @@ const resetUserPassWord = asyncHandler(async (req, res) => {
     }
   } catch (error) {
     // console.log(error);
-   
     res.status(401);
     throw new Error("token is not verfied!!");
   }
@@ -374,8 +366,11 @@ const getUser = asyncHandler(async (req, res) => {
 
 const verifyPassword = asyncHandler(async (req, res) => {
   const { id, password } = req.params;
-  const user = await User.findOne({ id });
-  if (!(user && (await user.matchPassword(password)))) {
+  const user1 = await User.findOne({ _id: id });
+  // console.log("user", id);
+  // console.log("user", user1);
+
+  if (!(user1 && (await user1.matchPassword(password)))) {
     // res.status(401);
 
     // throw new Error("Old Password is not correct!!");
@@ -413,7 +408,7 @@ const updatePassword = asyncHandler(async (req, res) => {
   }
 });
 
-const storeNotifiactions=(offUsers)=>{
+const storeNotifiactions = (offUsers) => {
   for (const key in offUsers) {
     User.findByIdAndUpdate(
       key,
@@ -427,7 +422,7 @@ const storeNotifiactions=(offUsers)=>{
       }
     );
   }
-}
+};
 
 module.exports = {
   registerUser,
@@ -441,5 +436,5 @@ module.exports = {
   verifyPassword,
   updatePassword,
   verifyEmail,
-  storeNotifiactions
+  storeNotifiactions,
 };
