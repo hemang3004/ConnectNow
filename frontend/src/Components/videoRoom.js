@@ -191,6 +191,10 @@ const VideoRoom = () => {
     document.getElementById("streams__container").appendChild(child);
 
     videoBox.style.paddingTop = "20px";
+    for (let i = 0; videoFrames.length > i; i++) {
+      videoFrames[i].style.height = "300px";
+      videoFrames[i].style.width = "300px";
+    }
 
     if (
       (!isParticipantsClose && isChatsClose) ||
@@ -589,6 +593,11 @@ const VideoRoom = () => {
                  </div>`;
 
       displayFrame.insertAdjacentHTML("beforeend", String(player));
+      const userName = document.createElement("p");
+      userName.id = `user-name-${uid}`;
+      userName.textContent = user.name;
+
+      document.getElementById(`user-container-${uid}`).appendChild(userName);
       if (remoteUsers)
         document.getElementById(`user-${uid}`).style.transform = "scaleX(-1)";
 
@@ -628,6 +637,11 @@ const VideoRoom = () => {
                  </div>`;
 
       displayFrame.insertAdjacentHTML("beforeend", player);
+      const userName = document.createElement("p");
+      userName.id = `user-name-${uid}`;
+      userName.textContent = user.name;
+
+      document.getElementById(`user-container-${uid}`).appendChild(userName);
 
       document
         .getElementById(`user-container-${uid}`)

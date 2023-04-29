@@ -107,6 +107,10 @@
 #stream__box {
   position: relative;
 }
+#stream__box .video-player {
+  position: relative;
+  transform: scaleX(-1);
+}
 
 .stream__focus {
   width: 100%;
