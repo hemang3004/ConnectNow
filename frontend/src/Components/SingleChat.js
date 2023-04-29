@@ -1,4 +1,4 @@
-import { ArrowBackIcon, Icon,InfoIcon } from "@chakra-ui/icons";
+import { ArrowBackIcon, Icon, InfoIcon } from "@chakra-ui/icons";
 import { FormControl } from "@chakra-ui/form-control";
 import { Input } from "@chakra-ui/input";
 import { Box, Text, Stack, HStack } from "@chakra-ui/layout";
@@ -32,13 +32,19 @@ import { BsEmojiSmileFill } from "react-icons/bs";
 
 import UpdateGroupChatModal from "./miscellaneous/UpdateGroupChatModal";
 import { ChatState } from "../Context/ChatProvider";
-import { MdCall, MdOutlineMic, MdAttachFile, MdDelete,MdAlbum } from "react-icons/md";
+import {
+  MdCall,
+  MdOutlineMic,
+  MdAttachFile,
+  MdDelete,
+  MdAlbum,
+} from "react-icons/md";
 import { useHistory } from "react-router-dom";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
 
-var  selectedChatCompare;
+var selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const inputRef = useRef();
@@ -46,14 +52,14 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [loading, setLoading] = useState(false);
   const [videoCallOn, setVideoCallOn] = useState(false);
   const [newMessage, setNewMessage] = useState("");
-  const [status,setStatus]=useState(false);
+  const [status, setStatus] = useState(false);
   const [typing, setTyping] = useState(false);
   const [istyping, setIsTyping] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [file, setFile] = useState('');
-  const [url,setUrl]=useState('')
-  const [activeUser,setActiveUser]=useState({});
+  const [file, setFile] = useState("");
+  const [url, setUrl] = useState("");
+  const [activeUser, setActiveUser] = useState({});
   const fileInputRef = useRef();
   const {
     selectedChat,
@@ -65,7 +71,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     setNewMsg,
     activeUsers,
     socket,
-    socketConnected
+    socketConnected,
   } = ChatState();
 
   const { transcript, resetTranscript, listening } = useSpeechRecognition();
@@ -110,8 +116,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       setLoading(false);
 
       socket.emit("join chat", selectedChat._id);
-      
-      
     } catch (error) {
       toast({
         title: "Error Occured!",
@@ -150,8 +154,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
           {
             content: cipherText,
             chatId: selectedChat,
-            type:"text",
-            url:""
+            type: "text",
+            url: "",
           },
           config
         );
@@ -169,9 +173,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
           position: "bottom",
         });
       }
-    }
-    else if(event.key === "Enter" && newMessage && file){
-      
+    } else if (event.key === "Enter" && newMessage && file) {
       try {
         const config = {
           headers: {
@@ -190,10 +192,10 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         const { data } = await axios.post(
           "/api/message",
           {
-            content:cipherText,
+            content: cipherText,
             chatId: selectedChat,
-            type:"file",
-            url:String(url)
+            type: "file",
+            url: String(url),
           },
           config
         );
@@ -211,7 +213,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
           position: "bottom",
         });
       }
-  }};
+    }
+  };
 
   const handleButtonClick = (e) => {
     e.preventDefault();
@@ -232,7 +235,9 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   useEffect(() => {
     socket.on("typing", () => setIsTyping(true));
     socket.on("stop typing", () => setIsTyping(false));
-    socket.on("show calling", ()=> {setVideoCallOn(true)});
+    socket.on("show calling", () => {
+      setVideoCallOn(true);
+    });
     // socket.on("show members of video",(nums)=>{console.log(nums);})
   }, []);
 
@@ -257,7 +262,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
           setFetchAgain(!fetchAgain);
         }
       } else {
-        setNewMsg([...messages,newMessageRecieved])
+        setNewMsg([...messages, newMessageRecieved]);
         setMessages([...messages, newMessageRecieved]);
       }
     });
@@ -317,35 +322,37 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
   const uploadFile = async (data) => {
     try {
-     
-        const config = {
-          headers: {
-            "Content-type": "FormData",
-            Authorization: `Bearer ${user.token}`,
-          }}
-        
-      console.log("Files here",data)
-        const response = await axios.post(`api/message/uploadFile/${selectedChat._id}`,data,config);
-       return response.data
+      const config = {
+        headers: {
+          "Content-type": "FormData",
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+
+      console.log("Files here", data);
+      const response = await axios.post(
+        `api/message/uploadFile/${selectedChat._id}`,
+        data,
+        config
+      );
+      return response.data;
     } catch (error) {
-        console.log('Error while calling the API ', error.message);
+      console.log("Error while calling the API ", error.message);
     }
-}
-useEffect(()=>{
-  const getImage = async () => {
-    if (file) {
+  };
+  useEffect(() => {
+    const getImage = async () => {
+      if (file) {
         const data = new FormData();
         data.append("name", file.name);
         data.append("file", file);
-       const response=await uploadFile(data);
-       setUrl(response);
-    }
-}
-getImage();
-console.log()
-},[file])
-
- 
+        const response = await uploadFile(data);
+        setUrl(response);
+      }
+    };
+    getImage();
+    console.log();
+  }, [file]);
 
   const handleEmojiPickerHideShow = () => {
     setShowEmojiPicker(!showEmojiPicker);
@@ -357,50 +364,47 @@ console.log()
     messg += emoji.emoji;
     setNewMessage(messg);
   };
-useEffect(()=>{
+  useEffect(() => {}, [inputRef]);
+  const sendStatus = () => {
+    const y = getSenderFull(user, selectedChat.users)._id;
+    const x = activeUsers?.filter((u) => u._id === y)[0];
+    return x?.online;
+  };
+  const getLastSeen = () => {
+    const y = getSenderFull(user, selectedChat.users)._id;
+    const x = activeUsers?.filter((u) => u._id === y)[0];
+    return x?.lasttime;
+  };
+  const actualDate = (Datetime) => {
+    if (!Datetime) return "";
+    let date_ob = new Date(Datetime);
+    const date = new Date();
+    const offset = -moment.tz(date, user.timeZone).utcOffset();
 
-},[inputRef])
-const sendStatus = () => {
-  const y = getSenderFull(user, selectedChat.users)._id;
-  const x = activeUsers?.filter((u) => u._id === y)[0];
-  return x?.online;
-};
-const getLastSeen = () => {
-  const y = getSenderFull(user, selectedChat.users)._id;
-  const x = activeUsers?.filter((u) => u._id === y)[0];
-  return x?.lasttime;
-};
-const actualDate=(Datetime)=>{
-  if(!Datetime)return ""
-  let date_ob = new Date(Datetime);
-  const date = new Date();
- const offset = -moment.tz(date, user.timeZone).utcOffset();
+    // const options = { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone };
+    date_ob.setMinutes(date_ob.getMinutes() - offset);
 
-  // const options = { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone };
-  date_ob.setMinutes(date_ob.getMinutes()-offset)
+    let day = ("0" + date_ob.getDate()).slice(-2);
 
-  let day = ("0" + date_ob.getDate()).slice(-2);
+    // // current month
+    let month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
 
-  // // current month
-  let month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
+    // // current year
+    let year = date_ob.getFullYear();
 
-  // // current year
-  let year = date_ob.getFullYear();
+    // // current hours
+    let hours = ("0" + date_ob.getHours()).slice(-2);
 
-  // // current hours
-  let hours = ("0" + date_ob.getHours()).slice(-2);
+    // // current minutes
+    let minutes = ("0" + date_ob.getMinutes()).slice(-2);
 
-  // // current minutes
-  let minutes = ("0" + date_ob.getMinutes()).slice(-2);
+    // // current seconds
 
-  // // current seconds
-  
-
-  // DD/MM/YYYY HH:MM
-  let curr =day+'/'+month+'/'+year+' '+hours+':'+minutes;
-  // console.log(date_ob)
-  return 'Last Seen At : '+curr;
-};
+    // DD/MM/YYYY HH:MM
+    let curr = day + "/" + month + "/" + year + " " + hours + ":" + minutes;
+    // console.log(date_ob)
+    return "Last Seen At : " + curr;
+  };
   return (
     <>
       {selectedChat ? (
@@ -475,7 +479,9 @@ const actualDate=(Datetime)=>{
                       fontSize={"12px !important"}
                       mt={"0px !important"}
                     >
-                      {sendStatus() ? "Online" : `Offline ${actualDate(getLastSeen())}`}
+                      {sendStatus()
+                        ? "Online"
+                        : `Offline ${actualDate(getLastSeen())}`}
                     </Box>
                   </Stack>
                   <ProfileModal
@@ -486,10 +492,8 @@ const actualDate=(Datetime)=>{
                 <>
                   {/* group name */}
                   {selectedChat.chatName.toUpperCase()}
-                  
-                  <div style={{ display: "flex", flexDirection: "row" }}>
-                    
 
+                  <div style={{ display: "flex", flexDirection: "row" }}>
                     <UpdateGroupChatModal
                       fetchMessages={fetchMessages}
                       fetchAgain={fetchAgain}
@@ -585,19 +589,18 @@ const actualDate=(Datetime)=>{
                 <IconButton
                   icon={<MdAttachFile />}
                   colorScheme="blue"
-                  onClick={()=>fileInputRef.current.click()}
+                  onClick={() => fileInputRef.current.click()}
                   variant="solid"
                 ></IconButton>
                 <input
                   type="file"
                   ref={fileInputRef}
                   style={{ display: "none" }}
-                  onChange={(e) =>{
-                    console.log(e.target.files[0])
-                    setFile(e.target.files[0])
-                    setNewMessage(e.target.files[0]?.name)
-                  } }
-
+                  onChange={(e) => {
+                    console.log(e.target.files[0]);
+                    setFile(e.target.files[0]);
+                    setNewMessage(e.target.files[0]?.name);
+                  }}
                 />
               </HStack>
             </FormControl>
