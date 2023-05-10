@@ -122,7 +122,6 @@ const deleteChannel = asyncHandler(async (req, res) => {
 });
 
 const fetchChannels = asyncHandler(async (req, res) => {
-  console.log("hello");
   try {
     Channel.find({ users: { $elemMatch: { $eq: req.user._id } } })
       .populate("users", "-password")

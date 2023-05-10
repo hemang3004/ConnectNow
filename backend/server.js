@@ -11,6 +11,7 @@ const cors=require("cors")
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 const {storeNotifiactions}=require("./controller/userController");
 const getDate = require("./config/getDate");
+const path=require("path")
 // express app
 const app = express();
 //use of dotenv
@@ -37,6 +38,18 @@ app.use("/api/message", messageRoutes);
 app.use("/api/channel", channelRoutes);
 app.use("/api/channelmessage", channelMessageRoutes);
 
+const dirname1=path.resolve()
+if(process.env.NODE_ENV==='production'){
+  app.use(express.static(path.join(dirname1,'/frontend/build')))
+  app.get('*',(req,res)=>{
+    res.sendFile(path.resovle(dirname1,"frontend","build","index.html"))
+  })
+}
+else{
+  app.get("/",(req,res)=>{
+    res.send("API is Running Successfully")
+  })
+}
 app.use(notFound);
 app.use(errorHandler);
 
@@ -103,10 +116,8 @@ io.on("connection", (socket) => {
       rooms[room].count+=1
     }
     
-    console.log(name + "User Joined Video Room: " + room);
   });
   socket.on("getOrganizerName",(room)=>{
-    console.log(rooms[room]?.organizer,rooms[room]?.org_id)
     socket.emit("organizerName",rooms[room]?.organizer,rooms[room]?.org_id);
   })
   socket.on("leave video",(room)=>{
@@ -138,7 +149,6 @@ io.on("connection", (socket) => {
   });
   socket.on("join channel", (room) => {
     socket.join(room);
-    console.log("User Joined Channel: " + room);
   });
   socket.on("new channelmessage", (newMessageRecieved) => {
     var channel = newMessageRecieved.channel;

@@ -83,12 +83,10 @@ conn.once('open', () => {
 
 
 const uploadFile = (request, response) => {
-  console.log("Hello Files HEre",request.file)
     if(!request.file) 
         return response.status(404).json("File not found");
     
     const imageUrl = `${url}/api/message/file/${request.file.filename}`;
-
     response.status(200).json(imageUrl);    
 }
 
